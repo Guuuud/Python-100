@@ -1,0 +1,128 @@
+
+
+
+CHIP FeistelEncryption {
+ IN plaintext[16], key[8];
+ OUT ciphertext[16];
+PARTS: 
+	
+
+	
+	//Li+1 = Ri
+	//Ri+1 =Li ⊕F(Ri,Ki);
+
+
+	//get F(R0,K0);
+	Xor(x = plaintext[7],y = key[7],out = L0);
+	Xor(x = plaintext[6],y = key[6],out = L1);
+	Xor(x = plaintext[5],y = key[5],out = L2);
+	Xor(x = plaintext[4],y = key[4],out = L3);
+	Xor(x = plaintext[3],y = key[3],out = L4);
+	Xor(x = plaintext[2],y = key[2],out = L5);
+	Xor(x = plaintext[1],y = key[1],out = L6);
+	Xor(x = plaintext[0],y = key[0],out = L7);
+
+
+	//get R1 namely R1 = L0 + F(R0,k0);
+	Xor(x = plaintext[15],y = L0,out = sec0);
+	Xor(x = plaintext[14],y = L1, out = sec1);
+	Xor(x = plaintext[13],y = L2, out = sec2);
+	Xor(x = plaintext[12],y = L3, out = sec3);
+	Xor(x = plaintext[11], y = L4, out = sec4);
+	Xor(x = plaintext[10], y = L5, out = sec5);
+	Xor(x = plaintext[9], y = L6, out = sec6);
+	Xor(x = plaintext[8], y = L7, out = sec7);
+
+
+
+
+	//get F(R1,K1);
+	Xor(x = sec0, y = key[6], out = F0);
+	Xor(x = sec1, y = key[5], out = F1);
+	Xor(x = sec2, y = key[4], out = F2);
+	Xor(x = sec3, y = key[3], out = F3);
+	Xor(x = sec4, y = key[2], out = F4);
+	Xor(x = sec5, y = key[1], out = F5);
+	Xor(x = sec6, y = key[0], out = F6);
+	Xor(x = sec7, y = key[7], out = F7);
+
+
+	//get R2 namely R2 = L1 + F(R1,k1);
+	//and now , L1 has turn to R0
+	Xor(x = plaintext[7], y = F0, out = R20);
+	Xor(x = plaintext[6], y = F1, out = R21);
+	Xor(x = plaintext[5], y = F2, out = R22);
+	Xor(x = plaintext[4], y = F3, out = R23);
+	Xor(x = plaintext[3], y = F4, out = R24);
+	Xor(x = plaintext[2], y = F5, out = R25);
+	Xor(x = plaintext[1], y = F6, out = R26);
+	Xor(x = plaintext[0], y = F7, out = R27);
+
+
+	//get F1(R2,K2);
+	Xor(x = R20, y = key[5], out = F10);
+	Xor(x = R21, y = key[4], out = F11);
+	Xor(x = R22, y = key[3], out = F12);
+	Xor(x = R23, y = key[2], out = F13);
+	Xor(x = R24, y = key[1], out = F14);
+	Xor(x = R25, y = key[0], out = F15);
+	Xor(x = R26, y = key[7], out = F16);
+	Xor(x = R27, y = key[6], out = F17);
+
+	//get R3 namely R3 = L2 + F(R2,k2);
+	//and now , L2 has turn to R1
+	Xor(x = sec0, y = F10, out = R30);
+	Xor(x = sec1, y = F11, out = R31);
+	Xor(x = sec2, y = F12, out = R32);
+	Xor(x = sec3, y = F13, out = R33);
+	Xor(x = sec4, y = F14, out = R34);
+	Xor(x = sec5, y = F15, out = R35);
+	Xor(x = sec6, y = F16, out = R36);
+	Xor(x = sec7, y = F17, out = R37);
+
+
+	//get F(R3,K3);
+	Xor(x = R30, y = key[4],out = F20);
+	Xor(x = R31, y = key[3],out = F21);
+	Xor(x = R32, y = key[2],out = F22);
+	Xor(x = R33, y = key[1],out = F23);
+	Xor(x = R34, y = key[0],out = F24);
+	Xor(x = R35, y = key[7],out = F25);
+	Xor(x = R36, y = key[6],out = F26);
+	Xor(x = R37, y = key[5],out = F27);
+
+	//get R4 namely R4 = L3 + F(R3,K3);
+	Xor(x = R20, y = F20, out = R40);
+	Xor(x = R21, y = F21, out = R41);
+	Xor(x = R22, y = F22, out = R42);
+	Xor(x = R23, y = F23, out = R43);
+	Xor(x = R24, y = F24, out = R44);
+	Xor(x = R25, y = F25, out = R45);
+	Xor(x = R26, y = F26, out = R46);
+	Xor(x = R27, y = F27, out = R47);
+
+	And(x = R40,y = true,out = ciphertext[7]);
+	And(x = R41,y = true,out = ciphertext[6]);
+	And(x = R42,y = true,out = ciphertext[5]);
+	And(x = R43,y = true,out = ciphertext[4]);
+	And(x = R44,y = true,out = ciphertext[3]);
+	And(x = R45,y = true,out = ciphertext[2]);
+	And(x = R46,y = true,out = ciphertext[1]);
+	And(x = R47,y = true,out = ciphertext[0]);
+
+	And(x = R30,y = true,out = ciphertext[15]);
+	And(x = R31,y = true,out = ciphertext[14]);
+	And(x = R32,y = true,out = ciphertext[13]);
+	And(x = R33,y = true,out = ciphertext[12]);
+	And(x = R34,y = true,out = ciphertext[11]);
+	And(x = R35,y = true,out = ciphertext[10]);
+	And(x = R36,y = true,out = ciphertext[9]);
+	And(x = R37,y = true,out = ciphertext[8]);
+
+	
+
+
+
+
+
+}
